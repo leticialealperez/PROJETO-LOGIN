@@ -3,15 +3,18 @@ import { TextField } from '@mui/material'
 
 interface InputDefaultProps {
     type: string;
-    name: string;
+    name: Name;
     label: string;
     value: string;
-    handleChange: () => void;
+    color: 'error' | 'secondary';
+    handleChange: (value: string, key: Name) => void;
 }
 
-function InputDefault({ type, name, label, value, handleChange }: InputDefaultProps) {
+export type Name = 'name' | 'email' | 'password' | 'repassword'
+
+function InputDefault({ type, name, label, value, color, handleChange }: InputDefaultProps) {
     return (
-        <TextField color='secondary' focused fullWidth name={name} label={label} variant="outlined" type={type} value={value} onChange={handleChange}/>
+        <TextField color={color} focused fullWidth name={name} label={label} variant="outlined" type={type} value={value} onChange={(ev) => handleChange(ev.target.value, name)}/>
     )
 }
 
