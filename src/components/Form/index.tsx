@@ -161,7 +161,7 @@ function Form({ mode }: FormProps) {
            }
         }
 
-        localStorage.setItem('usuarioLogado', userExist?.email as string)
+        localStorage.setItem('usuarioLogado', JSON.stringify(userExist))
         
         alert('Login efetuado com sucesso! Redirecionando...')
         setTimeout(() => {
