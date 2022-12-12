@@ -3,14 +3,14 @@ import { TextField } from '@mui/material'
 
 interface InputDefaultProps {
     type: string;
-    name: Name;
+    name: InputName;
     label: string;
     value: string;
     color: 'error' | 'secondary';
-    handleChange: (value: string, key: Name) => void;
+    handleChange: (value: string, key: InputName) => void;
 }
 
-export type Name = 'name' | 'email' | 'password' | 'repassword'
+export type InputName = 'name' | 'email' | 'password' | 'repassword'
 
 function InputDefault({ type, name, label, value, color, handleChange }: InputDefaultProps) {
     return (

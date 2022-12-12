@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { InputDefault, Name } from '../InputDefault';
+import { InputDefault, InputName } from '../InputDefault';
 import { Stack, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,66 +34,83 @@ function Form({ mode }: FormProps) {
 
     useEffect(
         () => {
-            if(name.length < 3) {
-                setErrorName(true);
-            } else {
-                setErrorName(false);
-            }
-
-            // eslint-disable-next-line no-useless-escape
-            const regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
-            if(!email.match(regexEmail)) {
-                setErrorEmail(true)
-            }else {
-                setErrorEmail(false)
-            }
-
-            if(mode === 'signup') {
-                if(!password || !repassword || password.length < 6 || password !== repassword) {
-                   
-                    setErrorPassword(true)
-                    
-                } else {
-                    setErrorPassword(false)
-                }
-            }
-
-            if(mode === 'login') {
-                if(!password){
-                    setErrorPassword(true)
-                } else {
-                    setErrorPassword(false)
-                }
-            }
-        },
-        [name, email, password, repassword, mode]
-
-    )
-
-    useEffect(
-        () => {
             localStorage.setItem('listaUsers', JSON.stringify(listaUsuarios));
         },
         [listaUsuarios]
     )
 
-    const mudarInput = (value: string, key: Name) => {
+    const handleValidateInput = (value: string, key: InputName) => {
+        switch(key) {
+            case 'name':
+                if(value.length < 3) {
+                    setErrorName(true);
+                } else {
+                    setErrorName(false);
+                }
+            break;
+
+            case 'email':
+                // eslint-disable-next-line no-useless-escape
+                const regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+                if(!value.match(regexEmail)) {
+                    setErrorEmail(true)
+                }else {
+                    setErrorEmail(false)
+                }
+            break;
+
+            case 'password':
+                if(mode === 'signup') {
+                    if(!value || value.length < 6) {
+                        setErrorPassword(true)
+                        
+                    } else {
+                        setErrorPassword(false)
+                    }
+                }
+
+                if(mode === 'login') {
+                    if(!value){
+                        setErrorPassword(true)
+                    } else {
+                        setErrorPassword(false)
+                    }
+                }
+            break;
+
+            case 'repassword':
+                if(value !== password) {
+                    setErrorPassword(true)
+                } else {
+                    setErrorPassword(false)
+                }
+            break
+
+            default:
+        }
+    }
+
+    const mudarInput = (value: string, key: InputName) => {
         switch(key) {
             case 'name':
                 setName(value)
+                handleValidateInput(value, key)
             break;
 
             case 'email':
                 setEmail(value)
+                handleValidateInput(value, key)
             break;
 
             case 'password':
                 setPassword(value)
+                handleValidateInput(value, key)
             break;
 
             case 'repassword':
                 setRepassword(value)
+                handleValidateInput(value, key)
             break
 
             default:
