@@ -1,10 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BannerImage } from '../../components/BannerImage';
 import { ContainerForm } from '../../components/ContainerForm';
 import { Form } from '../../components/Form';
 import { WrapperContent } from '../../components/WrapperContent';
+import { User } from '../../config/types';
 
 function Login() {
+    const navigate = useNavigate();
+    const [userLogged, setUserLogged] = useState<User | undefined>(JSON.parse(localStorage.getItem('usuarioLogado') ?? 'undefined'));
+
+    useEffect(
+        () => {
+
+            if(userLogged) {
+                navigate('/home')
+            } 
+
+            return () => {
+                console.log('DESMONTOU login')
+            }
+        },
+
+       
+        [navigate, userLogged]
+    )
     return (
         <WrapperContent>
             <BannerImage />

@@ -2,22 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { InputDefault, InputName } from '../InputDefault';
 import { Stack, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { User } from '../../config/types';
 
-interface FormProps {
-    mode: 'login' | 'signup';
-}
-
-interface Recado {
-    id: string;
-    description: string;
-    detail: string;
-}
-
-interface User {
-    name: string;
-    email: string;
-    password: string;
-    recados: Recado[];
+export interface FormProps {
+  mode: 'login' | 'signup';
 }
 
 function Form({ mode }: FormProps) {

@@ -1,30 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { User } from '../../config/types';
 
 function Home() {
     const navigate = useNavigate();
-    const [userLogged, setUserLogged] = useState('');
+    const [userLogged, setUserLogged] = useState<User | undefined>(JSON.parse(localStorage.getItem('usuarioLogado') ?? 'undefined'));
 
     useEffect(
         () => {
-            const usuarioLogado = localStorage.getItem('usuarioLogado');
 
-            if(!usuarioLogado) {
+            if(!userLogged) {
                 navigate('/')
-            } else {
-                setUserLogged(usuarioLogado);
-            }
-
+            } 
 
             return () => {
-                console.log('DESMONTOU')
+                console.log('DESMONTOU home')
             }
         },
 
        
-        [navigate]
+        [navigate, userLogged]
     )
-    return (<h1>HELLOW, {userLogged}</h1>)
+    return (<h1>HELLOW, {userLogged?.name}</h1>)
 }
 
 
