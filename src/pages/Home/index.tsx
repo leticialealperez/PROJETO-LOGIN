@@ -4,7 +4,7 @@ import { User } from '../../config/types';
 
 function Home() {
     const navigate = useNavigate();
-    const [userLogged, setUserLogged] = useState<User | undefined>(JSON.parse(localStorage.getItem('usuarioLogado') ?? 'undefined'));
+    const [userLogged, setUserLogged] = useState<User | null>(JSON.parse(localStorage.getItem('usuarioLogado') ?? 'null'));
 
     useEffect(
         () => {
