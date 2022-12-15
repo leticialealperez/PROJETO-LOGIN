@@ -2,9 +2,9 @@ import { Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InputDefault, InputName } from '../../components/InputDefault';
-import { Recado, User } from '../../config/types';
 import { v4 as uuid} from 'uuid';
 import { Modal } from '../../components/Modal';
+import { Recado, User } from '../../store/modules/typeStore';
 
 const rows = [
   { id: '123', description: 'Teste', detail: 'Teste detalhamento'},
@@ -36,7 +36,8 @@ function Home() {
 
     useEffect(() => {
         // aqui executa quando os recados são atualizados -> TODO -> atualizar o localStorage
-    }, [userLogged?.recados])
+        localStorage.setItem('userLogged', JSON.stringify(userLogged))
+    }, [userLogged])
 
     const mudarInput = (value: string, key: InputName) => {
         switch(key) {

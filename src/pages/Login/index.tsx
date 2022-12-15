@@ -4,7 +4,7 @@ import { BannerImage } from '../../components/BannerImage';
 import { ContainerForm } from '../../components/ContainerForm';
 import { Form } from '../../components/Form';
 import { WrapperContent } from '../../components/WrapperContent';
-import { User } from '../../config/types';
+import { User } from '../../store/modules/typeStore';
 
 function Login() {
     const navigate = useNavigate();

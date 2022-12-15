@@ -10,3 +10,5 @@ export interface User {
   password: string;
   recados: Recado[];
 }
+
+export type Users = User[];

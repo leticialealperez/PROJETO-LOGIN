@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import React from 'react';
-import { User } from '../../config/types';
+import { User } from '../../store/modules/typeStore';
 
 interface ModalProps {
     open: boolean;
