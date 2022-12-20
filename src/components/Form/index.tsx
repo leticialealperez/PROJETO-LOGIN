@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { InputDefault, InputName } from '../InputDefault';
 import { Stack, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { User } from '../../store/modules/typeStore';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { adicionarNovoUsuario } from '../../store/modules/users/usersSlice';
 
 
 export interface FormProps {
@@ -17,16 +18,11 @@ function Form({ mode }: FormProps) {
     const [errorName, setErrorName] = useState(false);
     const [errorEmail, setErrorEmail] = useState(false);
     const [errorPassword, setErrorPassword] = useState(false);
-    const [listaUsuarios, setListaUsuarios] = useState<User[]>(JSON.parse(localStorage.getItem('listaUsers') ?? '[]'));
+    const usersRedux = useAppSelector((state) => state.users); // get - traz as infos de users da store
+
+    const dispatch = useAppDispatch(); // cria-se uma variavel que recebe o retorno da execução do useAppDispatch
     
     const navigate = useNavigate();
-
-    useEffect(
-        () => {
-            localStorage.setItem('listaUsers', JSON.stringify(listaUsuarios));
-        },
-        [listaUsuarios]
-    )
 
     const handleValidateInput = (value: string, key: InputName) => {
         switch(key) {
@@ -123,10 +119,10 @@ function Form({ mode }: FormProps) {
             recados: []
         }
 
-        const userExist = listaUsuarios.some((user) => user.email === newUser.email);
+        const userExist = usersRedux.some((user) => user.email === newUser.email);
 
         if(!userExist) {
-            setListaUsuarios([...listaUsuarios, newUser])
+            dispatch(adicionarNovoUsuario(newUser))
             clearInputs();
             alert("Usuário Cadastrado! Você será redirecionado");
 
@@ -140,7 +136,7 @@ function Form({ mode }: FormProps) {
     }
 
     const login = () => {
-        const userExist = listaUsuarios.find((user) => user.email === email && user.password === password);
+        const userExist = usersRedux.find((user) => user.email === email && user.password === password);
 
         if(!userExist) {
            const confirma = window.confirm("Usuário não cadastrado. Deseja cadastrar uma conta? ")

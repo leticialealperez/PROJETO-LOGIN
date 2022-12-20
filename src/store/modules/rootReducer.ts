@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
-import { usersReducer } from './users';
+import { usersReducer } from './users/usersSlice';
+
 
 
 const rootReducer = combineReducers({

@@ -1,16 +1,31 @@
-import { createStore, applyMiddleware } from 'redux';
+import { configureStore } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
+import meuStorage from 'redux-persist/lib/storage'
+
 import { rootReducer } from './modules/rootReducer';
-import { composeWithDevTools } from 'redux-devtools-extension';
-import thunk from 'redux-thunk';
 
+// const persistConfig = {
+//   key: 'app',
+//   storage: meuStorage,
+// };
 
-const minhaStore = createStore(
-  rootReducer,
-  composeWithDevTools(applyMiddleware(thunk))
+const persistedReducer = persistReducer(
+  {
+    key: 'app',
+    //whitelist: ['users'],
+    storage: meuStorage,
+  }, 
+  rootReducer
 );
 
+const minhaStore = configureStore({
+  reducer: persistedReducer,
+});
 
-export { minhaStore }
+const persistor = persistStore(minhaStore);
+
+
+export { minhaStore, persistor }
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof minhaStore.getState>; 
