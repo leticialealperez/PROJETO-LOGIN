@@ -5,39 +5,39 @@ import { InputDefault, InputName } from '../../components/InputDefault';
 import { v4 as uuid} from 'uuid';
 import { Modal } from '../../components/Modal';
 import { Recado, User } from '../../store/modules/typeStore';
-
-const rows = [
-  { id: '123', description: 'Teste', detail: 'Teste detalhamento'},
-  { id: '1234', description: 'Teste', detail: 'Teste detalhamento'},
-  { id: '12356', description: 'Teste', detail: 'Teste detalhamento'},
-  { id: '123789', description: 'Teste', detail: 'Teste detalhamento'},
-];
-
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { atualizarUsuario, buscarUsuarioPorEmail } from '../../store/modules/users/usersSlice';
+import { adicionarNovoRecado, adicionarRecados, buscarRecados, limparRecados } from '../../store/modules/recados/recadosSlice';
+import { clearUsuarioLogado } from '../../store/modules/userLogged/userLoggedSlice';
 
 function Home() {
     const navigate = useNavigate();
-    const [userLogged, setUserLogged] = useState<User | null>(JSON.parse(localStorage.getItem('usuarioLogado') ?? 'null'));
     const [description, setDescription] = useState('')
     const [detail, setDetail] = useState('')
-    const [indiceSelecionadoExclusao, setIndiceSelecionadoExclusao] = useState(-1)
+    const [idSelecionado, setIdSelecionado] = useState('')
+    const [mode, setMode] = useState<'edit' | 'delete' | ''>('');
     const [openModal, setOpenModal] = useState(false)
+    const userLogged = useAppSelector((state) => state.userLogged)
+    const usuarioRedux = useAppSelector((state) => buscarUsuarioPorEmail(state, userLogged.email))
+    const recadosRedux = useAppSelector(buscarRecados);
+    const dispatch = useAppDispatch()
 
     useEffect(
         () => {
 
-            if(!userLogged) {
+            if(!userLogged.email) {
                 navigate('/')
             } 
+
+            if(usuarioRedux) {
+                dispatch(adicionarRecados(usuarioRedux.recados))
+            }
+
         },
 
        
-        [navigate, userLogged]
+        [navigate, userLogged, usuarioRedux, dispatch]
     )
-
-    useEffect(() => {
-        // aqui executa quando os recados são atualizados -> TODO -> atualizar o localStorage
-        localStorage.setItem('userLogged', JSON.stringify(userLogged))
-    }, [userLogged])
 
     const mudarInput = (value: string, key: InputName) => {
         switch(key) {
@@ -55,6 +55,15 @@ function Home() {
 
     const handleSaveAndLogout = () => {
         console.log('user', userLogged)
+
+       if(recadosRedux) {
+         dispatch(atualizarUsuario({ id: userLogged.email, changes: { recados: recadosRedux } }))
+       }
+
+       dispatch(clearUsuarioLogado())
+       dispatch(limparRecados())
+
+       navigate('/')
     }
 
     const handleSaveRecado = () => {
@@ -64,28 +73,30 @@ function Home() {
             detail
         }
 
-        if(userLogged) {
-            setUserLogged({ ...userLogged, recados: [...userLogged.recados, novoRecado]})
-            handleClear()
-        }
+        dispatch(adicionarNovoRecado(novoRecado))
+        handleClear()
     }
 
-    const handleEdit = (indice: number) => {
-        console.log('CLICOU EM id ', indice)
-    }
-
-    const handleDelete = (indice: number) => {
-        setIndiceSelecionadoExclusao(indice);
+    const handleEdit = (id: string) => {
+        setMode('edit')
+        setIdSelecionado(id);
         setOpenModal(true);
+    }
+
+    const handleDelete = (id: string) => {
+        setMode('delete');
+        setIdSelecionado(id);
+        setOpenModal(true);
+    }
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
     }
 
     const handleClear = () => {
         setDescription('')
         setDetail('')
-    }
-
-    const handleCloseModal = () => {
-        setOpenModal(false);
+        setMode('')
     }
 
     return (
@@ -122,7 +133,7 @@ function Home() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                            {userLogged?.recados.map((row, index) => (
+                            {recadosRedux.map((row, index) => (
                                 <TableRow
                                     key={row.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -133,8 +144,8 @@ function Home() {
                                     <TableCell align="center">{row.description}</TableCell>
                                     <TableCell align="center">{row.detail}</TableCell>
                                     <TableCell align="center">
-                                        <Button color='success' variant='contained' sx={{margin: '0 15px'}} onClick={() => handleEdit(index)}>Editar</Button>
-                                        <Button color='error' variant='contained' sx={{margin: '0 15px'}} onClick={() => handleDelete(index)}>Apagar</Button>
+                                        <Button color='success' variant='contained' sx={{margin: '0 15px'}} onClick={() => handleEdit(row.id)}>Editar</Button>
+                                        <Button color='error' variant='contained' sx={{margin: '0 15px'}} onClick={() => handleDelete(row.id)}>Apagar</Button>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -143,7 +154,7 @@ function Home() {
                     </TableContainer>
                 </Grid>
             </Grid>
-            <Modal indice={indiceSelecionadoExclusao} open={openModal} handleClose={handleCloseModal} user={userLogged as User} setUser={setUserLogged}/>
+            <Modal mode={mode} id={idSelecionado} open={openModal} handleClose={handleCloseModal}/>
         </Box>
     )
 }

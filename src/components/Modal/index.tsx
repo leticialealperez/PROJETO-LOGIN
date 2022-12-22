@@ -1,28 +1,44 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import React from 'react';
-import { User } from '../../store/modules/typeStore';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
+import React, {useState, useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { atualizarRecado, buscarRecadoPorId, deletarRecado } from '../../store/modules/recados/recadosSlice';
 
 interface ModalProps {
     open: boolean;
     handleClose: () => void;
-    user: User;
-    setUser: React.Dispatch<React.SetStateAction<User | null>>
-    indice: number;
+    id: string;
+    mode: ModeModal
 }
 
-function Modal({ open, handleClose, indice, user, setUser }: ModalProps) {
+type ModeModal = 'edit' | 'delete' | ''
+
+function Modal({ open, handleClose, id, mode }: ModalProps) {
+    const [description, setDescription] = useState('');
+    const [detail, setDetail] = useState('');
+    const recado = useAppSelector((state) => buscarRecadoPorId(state, id))
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        if(recado) {
+            setDescription(recado.description)
+            setDetail(recado.detail)
+        }
+    }, [recado])
 
     const handleConfirm = () => {
         
-        
-        const temp = [...user.recados]
+        if(mode === 'delete') {
+            dispatch(deletarRecado(id))
+        }
 
-        temp.splice(indice, 1)
-        setUser({...user, recados: temp})
+        if(mode === 'edit') {
+            dispatch(atualizarRecado({ id: id, changes: { detail, description }}))
+        }
+
         handleClose()
-       
-
     }
+
+
     return (
         <Dialog
         open={open}
@@ -30,16 +46,37 @@ function Modal({ open, handleClose, indice, user, setUser }: ModalProps) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         >
-            <DialogTitle id="alert-dialog-title">
-            {`Tem certeza que deseja excluir o recado ID ${indice}?`}
-            </DialogTitle>
+            {mode === 'delete' && (
+                <React.Fragment>
+                    <DialogTitle id="alert-dialog-title">
+                        {`Tem certeza que deseja excluir o recado?`}
+                    </DialogTitle>
 
-            <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-                Ao confirmar esta ação não poderá ser desfeita.
-            </DialogContentText>
-            </DialogContent>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Ao confirmar esta ação não poderá ser desfeita.
+                        </DialogContentText>
+                    </DialogContent>
+                </React.Fragment>
+            )}
+            {mode === 'edit' && (
+                <React.Fragment>
+                    <DialogTitle id="alert-dialog-title">
+                        {`Editar recado`}
+                    </DialogTitle>
 
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Informe a descrição e o detalhamento.
+                        </DialogContentText>
+                        <>
+                            <TextField value={description} name='description' label='Descrição' onChange={(ev) => setDescription(ev.target.value)}/>
+                            <TextField value={detail} name='detail' label='Detalhamento' onChange={(ev) => setDetail(ev.target.value)} />
+                        
+                        </>
+                    </DialogContent>
+                </React.Fragment>
+            )}
             <DialogActions>
                 <Button onClick={handleClose} autoFocus color='error' variant='outlined'>
                     Cancelar

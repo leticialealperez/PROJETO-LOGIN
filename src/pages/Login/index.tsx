@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BannerImage } from '../../components/BannerImage';
 import { ContainerForm } from '../../components/ContainerForm';
 import { Form } from '../../components/Form';
 import { WrapperContent } from '../../components/WrapperContent';
-import { User } from '../../store/modules/typeStore';
+import { useAppSelector } from '../../store/hooks';
 
 function Login() {
     const navigate = useNavigate();
-    const [userLogged, setUserLogged] = useState<User | null>(JSON.parse(localStorage.getItem('usuarioLogado') ?? 'null'));
+    const userLogged = useAppSelector((state) => state.userLogged)
 
     useEffect(
         () => {
 
-            if(userLogged) {
+            if(userLogged.email) {
                 navigate('/home')
             } 
 

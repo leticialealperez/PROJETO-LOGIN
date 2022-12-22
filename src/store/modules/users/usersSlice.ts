@@ -1,30 +1,28 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User, Users } from '../typeStore';
+import {
+  createSlice,
+  createEntityAdapter,
+} from '@reduxjs/toolkit';
+import { RootState } from '../..';
+import { User } from '../typeStore';
 
-const initialState: Users = [];
+
+// opcional - quando o identificador do dado for de nome id
+const usersAdapter = createEntityAdapter<User>({
+  selectId: (state) => state.email,
+});
+
+export const { selectAll: buscarUsuarios, selectById: buscarUsuarioPorEmail } = usersAdapter.getSelectors<RootState>((state) => state.users);
+
 
 const usersSlice = createSlice({
   name: 'users',
-  initialState,
+  initialState: usersAdapter.getInitialState({
+    mensagem: '',
+    loading: false,
+  }),
   reducers: {
-    adicionarNovoUsuario: (state, action: PayloadAction<User>) => {
-      return [...state, action.payload];
-    },
-    atualizarUsuario: (state, action: PayloadAction<User>) => {
-        const indexUser = state.findIndex(
-          (user) => user.email === action.payload.email
-        );
-
-        if (indexUser === -1) {
-          return state;
-        }
-
-        const listaTemp = [...state];
-
-        listaTemp[indexUser] = action.payload;
-
-        return listaTemp;
-    },
+    adicionarNovoUsuario: usersAdapter.addOne,
+    atualizarUsuario: usersAdapter.updateOne,
   },
 });
 

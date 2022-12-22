@@ -3,7 +3,8 @@ import { InputDefault, InputName } from '../InputDefault';
 import { Stack, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { adicionarNovoUsuario } from '../../store/modules/users/usersSlice';
+import { adicionarNovoUsuario, buscarUsuarios } from '../../store/modules/users/usersSlice';
+import { setUsuarioLogado } from '../../store/modules/userLogged/userLoggedSlice';
 
 
 export interface FormProps {
@@ -18,7 +19,7 @@ function Form({ mode }: FormProps) {
     const [errorName, setErrorName] = useState(false);
     const [errorEmail, setErrorEmail] = useState(false);
     const [errorPassword, setErrorPassword] = useState(false);
-    const usersRedux = useAppSelector((state) => state.users); // get - traz as infos de users da store
+    const usersRedux = useAppSelector(buscarUsuarios); // get - traz as infos de users da store
 
     const dispatch = useAppDispatch(); // cria-se uma variavel que recebe o retorno da execução do useAppDispatch
     
@@ -145,9 +146,8 @@ function Form({ mode }: FormProps) {
                 navigate('/signup')
            }
         }
-
-        localStorage.setItem('usuarioLogado', JSON.stringify(userExist))
         
+        dispatch(setUsuarioLogado({ name: userExist!.name, email: userExist!.email, password: userExist!.password }))
         alert('Login efetuado com sucesso! Redirecionando...')
         setTimeout(() => {
             navigate('/home')
