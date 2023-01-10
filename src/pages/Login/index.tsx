@@ -22,10 +22,6 @@ function Login() {
             if(userLogged.email) {
                 navigate('/home')
             } 
-
-            return () => {
-                console.log('DESMONTOU login')
-            }
         },
 
        

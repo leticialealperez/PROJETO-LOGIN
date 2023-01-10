@@ -18,34 +18,20 @@ export const { selectAll: buscarUsuarios, selectById: buscarUsuarioPorEmail } = 
 
 
 // criar asyncThunk
-export const getUsers = createAsyncThunk('users/getUsers', async () => {
-  const { data } = await apiGet('/users');
+export const getUsers = createAsyncThunk<ResponseAPI>('users/getUsers', async () => {
+  const response = await apiGet('/users');
 
-  if(data.success) {
-    return data
-  }
-
-  return {
-    ...data,
-    data: []
-  };
+  return response;
 });
 
 
 // saveUser
-export const saveUser = createAsyncThunk(
+export const saveUser = createAsyncThunk<ResponseAPI, SaveUserRequest>(
   'users/saveUser',
   async (dadosNovoUsuario: SaveUserRequest) => {
-    const { data } = await apiPost('/users', dadosNovoUsuario);
+    const response = await apiPost('/users', dadosNovoUsuario);
 
-    if (data.success) {
-      return data;
-    }
-
-    return {
-      ...data,
-      data: {},
-    };
+    return response;
   }
 );
 
@@ -58,6 +44,11 @@ const usersSlice = createSlice({
   }),
   reducers: {
     atualizarUsuario: usersAdapter.updateOne,
+    clearProperties: (state) => {
+      state.loading = false;
+      state.mensagem = '';
+      state.success = false;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(getUsers.pending, (state, action) => {
@@ -66,18 +57,11 @@ const usersSlice = createSlice({
     builder.addCase(
       getUsers.fulfilled,
       (state, action: PayloadAction<ResponseAPI>) => {
-        usersAdapter.setAll(state, action.payload.data);
+        if(action.payload.success) {
+          usersAdapter.setAll(state, action.payload.data);
+        }
         state.loading = false;
-        state.mensagem = action.payload.message;
         state.success = action.payload.success;
-      }
-    );
-    builder.addCase(
-      getUsers.rejected,
-      (state, action) => {
-        state.loading = false;
-        state.mensagem = action.error.message ?? '';
-        state.success = false;
       }
     );
 
@@ -86,23 +70,19 @@ const usersSlice = createSlice({
     });
     builder.addCase(
       saveUser.fulfilled,
-      (state, action: PayloadAction<ResponseAPI>) => {
-        usersAdapter.addOne(state, action.payload.data);
+      (state, action) => {
+        if(action.payload.success) {
+          usersAdapter.addOne(state, action.payload.data);
+        }
         state.loading = false;
         state.mensagem = action.payload.message;
         state.success = action.payload.success;
       }
-    );
-    builder.addCase(saveUser.rejected, (state, action) => {
-      state.loading = false;
-      state.mensagem = action.error.message ?? '';
-      state.success = false;
-    });
-    
+    );    
   }
 });
 
 
-export const { atualizarUsuario } = usersSlice.actions;
+export const { atualizarUsuario, clearProperties } = usersSlice.actions;
 
 export const usersReducer = usersSlice.reducer

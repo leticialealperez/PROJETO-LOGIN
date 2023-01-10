@@ -19,19 +19,38 @@ function Form({ mode }: FormProps) {
     const [errorName, setErrorName] = useState(false);
     const [errorEmail, setErrorEmail] = useState(false);
     const [errorPassword, setErrorPassword] = useState(false);
+    const [showErrorFeedback, setShowErrorFeedback] = useState(false);
+    const [showSuccessFeedback, setShowSuccessFeedback] = useState(false);
     const usersRedux = useAppSelector(buscarUsuarios); // get - traz as infos de users da store
     const { loading, success, mensagem } = useAppSelector((state) => state.users);
+    
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if(mode === 'signup' && success && !loading) {
-            alert(mensagem)
-        }
-
-    }, [loading, success, mensagem, navigate, mode])
-
     const dispatch = useAppDispatch(); // cria-se uma variavel que recebe o retorno da execução do useAppDispatch
     
+    useEffect(() => {
+        if(!loading && !success && mode === 'signup') {
+            setShowErrorFeedback(true)
+        } else {
+            setShowErrorFeedback(false)
+        }
+
+
+        if(!loading && success && mode === 'signup') {
+            setShowSuccessFeedback(true)
+        } else {
+            setShowSuccessFeedback(false)
+        }
+    }, [mode, loading, success, mensagem])
+
+    useEffect(() => {
+        if(showSuccessFeedback && mensagem ) {
+            setTimeout(() => {
+                navigate('/')
+            }, 2000)
+
+            clearInputs();
+        }
+    }, [navigate, showSuccessFeedback, mensagem])
     
 
     const handleValidateInput = (value: string, key: InputName) => {
@@ -181,6 +200,15 @@ function Form({ mode }: FormProps) {
             <Box marginTop={3}>
                 { mode === 'login' && ( <Typography color='white' variant='subtitle2'>Não tem conta? <Typography variant='button' color='secondary' sx={{cursor: 'pointer'}} onClick={handleNavigate}>Cadastre-se</Typography></Typography> )}
                 { mode === 'signup' && ( <Typography color='white' variant='subtitle2'>Já tem conta? <Typography variant='button' color='secondary' sx={{cursor: 'pointer'}} onClick={handleNavigate}>Fazer Login</Typography></Typography> )}
+            </Box>
+            <Box marginTop={3}>
+                { showErrorFeedback && mensagem && ( <Typography color='error' variant='subtitle2'>{ mensagem }</Typography> )}
+                { showSuccessFeedback && mensagem && ( 
+                    <React.Fragment>
+                        <Typography color='green' variant='subtitle2'>{ mensagem } 🎉</Typography>
+                        <Typography color='green' variant='subtitle2'>Você será redirecionado...</Typography>
+                    </React.Fragment> 
+                )}
             </Box>
         </>
 
