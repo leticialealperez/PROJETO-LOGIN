@@ -1,6 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
-import meuStorage from 'redux-persist/lib/storage'
 
 import { rootReducer } from './modules/rootReducer';
 
@@ -9,23 +7,12 @@ import { rootReducer } from './modules/rootReducer';
 //   storage: meuStorage,
 // };
 
-const persistedReducer = persistReducer(
-  {
-    key: 'app',
-    //whitelist: ['users'],
-    storage: meuStorage,
-  }, 
-  rootReducer
-);
 
 const minhaStore = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
 });
 
-const persistor = persistStore(minhaStore);
-
-
-export { minhaStore, persistor }
+export { minhaStore }
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof minhaStore.getState>; 

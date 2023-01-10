@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InputDefault, InputName } from '../InputDefault';
-import { Stack, Button, Box, Typography } from '@mui/material';
+import { Stack, Button, Box, Typography, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { adicionarNovoUsuario, buscarUsuarios } from '../../store/modules/users/usersSlice';
+import { buscarUsuarios, saveUser } from '../../store/modules/users/usersSlice';
 import { setUsuarioLogado } from '../../store/modules/userLogged/userLoggedSlice';
 
 
@@ -20,10 +20,19 @@ function Form({ mode }: FormProps) {
     const [errorEmail, setErrorEmail] = useState(false);
     const [errorPassword, setErrorPassword] = useState(false);
     const usersRedux = useAppSelector(buscarUsuarios); // get - traz as infos de users da store
+    const { loading, success, mensagem } = useAppSelector((state) => state.users);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if(mode === 'signup' && success && !loading) {
+            alert(mensagem)
+        }
+
+    }, [loading, success, mensagem, navigate, mode])
 
     const dispatch = useAppDispatch(); // cria-se uma variavel que recebe o retorno da execução do useAppDispatch
     
-    const navigate = useNavigate();
+    
 
     const handleValidateInput = (value: string, key: InputName) => {
         switch(key) {
@@ -116,24 +125,10 @@ function Form({ mode }: FormProps) {
         const newUser = {
             name,
             email,
-            password,
-            recados: []
+            password
         }
 
-        const userExist = usersRedux.some((user) => user.email === newUser.email);
-
-        if(!userExist) {
-            dispatch(adicionarNovoUsuario(newUser))
-            clearInputs();
-            alert("Usuário Cadastrado! Você será redirecionado");
-
-            setTimeout(() => {
-                navigate('/')
-            }, 1500)
-        } else {
-            alert('E-mail já em uso!')
-        }
-
+        dispatch(saveUser(newUser));
     }
 
     const login = () => {
@@ -147,7 +142,7 @@ function Form({ mode }: FormProps) {
            }
         }
         
-        dispatch(setUsuarioLogado({ name: userExist!.name, email: userExist!.email, password: userExist!.password }))
+        dispatch(setUsuarioLogado({ id: userExist!.id, name: userExist!.name, email: userExist!.email, password: userExist!.password }))
         alert('Login efetuado com sucesso! Redirecionando...')
         setTimeout(() => {
             navigate('/home')
@@ -170,7 +165,7 @@ function Form({ mode }: FormProps) {
                         <InputDefault type='email' label='E-mail' name='email' value={email} handleChange={mudarInput} color={errorEmail ? 'error' : 'secondary'}/>
                         <InputDefault type='password' label='Senha' name='password' value={password} handleChange={mudarInput} color={errorPassword ? 'error' : 'secondary'}/>
                         <InputDefault type='password' label='Repita a Senha' name='repassword' value={repassword} handleChange={mudarInput} color={errorPassword ? 'error' : 'secondary'}/>
-                        <Button disabled={errorName || errorEmail || errorPassword} variant='contained' color='secondary' onClick={createAccount}>Criar Conta</Button>
+                        <Button disabled={errorName || errorEmail || errorPassword || loading } variant='contained' color='secondary' onClick={createAccount} startIcon={loading ? <CircularProgress /> : null}>Criar Conta</Button>
                     </>
                 )}
 

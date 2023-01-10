@@ -3,6 +3,7 @@ import { User } from '../typeStore';
 
 
 const initialState: Omit<User, 'recados'> = {
+  id: '',
   email: '',
   name: '',
   password: ''

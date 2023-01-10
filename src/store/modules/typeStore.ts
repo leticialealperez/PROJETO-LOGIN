@@ -5,10 +5,19 @@ export interface Recado {
 }
 
 export interface User {
+  id: string;
   name: string;
   email: string;
   password: string;
   recados: Recado[];
 }
+
+export interface ResponseAPI {
+  success: boolean;
+  message: string;
+  data: any
+}
+
+export type SaveUserRequest = Omit<User, 'recados' | 'id'>
 
 export type Users = User[];
