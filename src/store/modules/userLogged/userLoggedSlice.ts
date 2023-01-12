@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../typeStore';
 
 
-const initialState: Omit<User, 'recados'> = {
+const initialState: Omit<User, 'contacts'> = {
   id: '',
   email: '',
   name: '',
@@ -16,8 +16,9 @@ const userLoggedSlice = createSlice({
   reducers: {
     setUsuarioLogado: (
       state,
-      action: PayloadAction<Omit<User, 'recados'>>
+      action: PayloadAction<Omit<User, 'contacts'>>
     ) => {
+      state.id = action.payload.id;
       state.email = action.payload.email;
       state.name = action.payload.name;
       state.password = action.payload.password;

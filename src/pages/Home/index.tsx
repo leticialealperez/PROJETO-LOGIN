@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { InputDefault, InputName } from '../../components/InputDefault';
 import { v4 as uuid} from 'uuid';
 import { Modal } from '../../components/Modal';
-import { Recado, User } from '../../store/modules/typeStore';
+import { Contato, User } from '../../store/modules/typeStore';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { atualizarUsuario, buscarUsuarioPorEmail } from '../../store/modules/users/usersSlice';
-import { adicionarNovoRecado, adicionarRecados, buscarRecados, limparRecados } from '../../store/modules/recados/recadosSlice';
+import { saveContact, getContacts, buscarContatos, limparRecados } from '../../store/modules/contatos/contatosSlice';
 import { clearUsuarioLogado } from '../../store/modules/userLogged/userLoggedSlice';
 
 function Home() {
@@ -19,7 +19,7 @@ function Home() {
     const [openModal, setOpenModal] = useState(false)
     const userLogged = useAppSelector((state) => state.userLogged)
     const usuarioRedux = useAppSelector((state) => buscarUsuarioPorEmail(state, userLogged.email))
-    const recadosRedux = useAppSelector(buscarRecados);
+    const recadosRedux = useAppSelector(buscarContatos);
     const dispatch = useAppDispatch()
 
     useEffect(
@@ -30,7 +30,7 @@ function Home() {
             } 
 
             if(usuarioRedux) {
-                dispatch(adicionarRecados(usuarioRedux.recados))
+                dispatch(getContacts(userLogged.email))
             }
 
         },
@@ -57,7 +57,7 @@ function Home() {
         console.log('user', userLogged)
 
        if(recadosRedux) {
-         dispatch(atualizarUsuario({ id: userLogged.email, changes: { recados: recadosRedux } }))
+         dispatch(atualizarUsuario({ id: userLogged.email, changes: { contacts: recadosRedux } }))
        }
 
        dispatch(clearUsuarioLogado())
@@ -67,13 +67,12 @@ function Home() {
     }
 
     const handleSaveRecado = () => {
-        const novoRecado: Recado = {
-            id: uuid(),
-            description,
-            detail
+        const novoContato: Omit<Contato, 'id'> = {
+            name: description,
+            phone: detail
         }
 
-        dispatch(adicionarNovoRecado(novoRecado))
+        dispatch(saveContact({ idUser: userLogged.id, newContact: novoContato }))
         handleClear()
     }
 
@@ -141,8 +140,8 @@ function Home() {
                                     <TableCell component="th" scope="row">
                                         {index + 1}
                                     </TableCell>
-                                    <TableCell align="center">{row.description}</TableCell>
-                                    <TableCell align="center">{row.detail}</TableCell>
+                                    <TableCell align="center">{row.name}</TableCell>
+                                    <TableCell align="center">{row.phone}</TableCell>
                                     <TableCell align="center">
                                         <Button color='success' variant='contained' sx={{margin: '0 15px'}} onClick={() => handleEdit(row.id)}>Editar</Button>
                                         <Button color='error' variant='contained' sx={{margin: '0 15px'}} onClick={() => handleDelete(row.id)}>Apagar</Button>

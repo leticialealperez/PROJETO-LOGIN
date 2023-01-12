@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { buscarUsuarios, saveUser } from '../../store/modules/users/usersSlice';
 import { setUsuarioLogado } from '../../store/modules/userLogged/userLoggedSlice';
+import { setarRecados } from '../../store/modules/contatos/contatosSlice';
+import { Contato } from '../../store/modules/typeStore';
 
 
 export interface FormProps {
@@ -22,7 +24,7 @@ function Form({ mode }: FormProps) {
     const [showErrorFeedback, setShowErrorFeedback] = useState(false);
     const [showSuccessFeedback, setShowSuccessFeedback] = useState(false);
     const usersRedux = useAppSelector(buscarUsuarios); // get - traz as infos de users da store
-    const { loading, success, mensagem } = useAppSelector((state) => state.users);
+    const { loading, mensagem, success } = useAppSelector((state) => state.users);
     
     const navigate = useNavigate();
     const dispatch = useAppDispatch(); // cria-se uma variavel que recebe o retorno da execução do useAppDispatch
@@ -162,6 +164,8 @@ function Form({ mode }: FormProps) {
         }
         
         dispatch(setUsuarioLogado({ id: userExist!.id, name: userExist!.name, email: userExist!.email, password: userExist!.password }))
+        dispatch(setarRecados(userExist?.contacts as Contato[]))
+        
         alert('Login efetuado com sucesso! Redirecionando...')
         setTimeout(() => {
             navigate('/home')

@@ -1,7 +1,7 @@
-export interface Recado {
+export interface Contato {
   id: string;
-  description: string;
-  detail: string;
+  name: string;
+  phone: string;
 }
 
 export interface User {
@@ -9,7 +9,7 @@ export interface User {
   name: string;
   email: string;
   password: string;
-  recados: Recado[];
+  contacts: Contato[];
 }
 
 export interface ResponseAPI {
@@ -18,6 +18,21 @@ export interface ResponseAPI {
   data: any
 }
 
-export type SaveUserRequest = Omit<User, 'recados' | 'id'>
+export type SaveUserRequest = Omit<User, 'contacts' | 'id'>
+
+export interface SaveContactRequest {
+  idUser: string;
+  newContact: Omit<Contato, 'id'>
+}
+
+export interface UpdateContactRequest {
+  idUser: string;
+  idContact: string;
+  contactUpdated: Partial<Omit<Contato, 'id'>>;
+};
+
+export type DeleteContactRequest = Omit<UpdateContactRequest, 'contactUpdated'>;
+
+
 
 export type Users = User[];

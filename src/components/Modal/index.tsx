@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
 import React, {useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { atualizarRecado, buscarRecadoPorId, deletarRecado } from '../../store/modules/recados/recadosSlice';
+import { updateContact, buscarContatoPorId, deleteContact } from '../../store/modules/contatos/contatosSlice';
 
 interface ModalProps {
     open: boolean;
@@ -15,24 +15,25 @@ type ModeModal = 'edit' | 'delete' | ''
 function Modal({ open, handleClose, id, mode }: ModalProps) {
     const [description, setDescription] = useState('');
     const [detail, setDetail] = useState('');
-    const recado = useAppSelector((state) => buscarRecadoPorId(state, id))
+    const recado = useAppSelector((state) => buscarContatoPorId(state, id))
+    const userLogged = useAppSelector((state) => state.userLogged);
     const dispatch = useAppDispatch();
 
     useEffect(() => {
         if(recado) {
-            setDescription(recado.description)
-            setDetail(recado.detail)
+            setDescription(recado.name)
+            setDetail(recado.phone)
         }
     }, [recado])
 
     const handleConfirm = () => {
         
         if(mode === 'delete') {
-            dispatch(deletarRecado(id))
+            dispatch(deleteContact({ idUser: userLogged.id, idContact: id }))
         }
 
         if(mode === 'edit') {
-            dispatch(atualizarRecado({ id: id, changes: { detail, description }}))
+            dispatch(updateContact({ idUser: userLogged.id, idContact: id, contactUpdated: { name: description ?? recado?.name, phone: detail ?? recado?.phone }}))
         }
 
         handleClose()

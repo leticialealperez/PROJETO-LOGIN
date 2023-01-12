@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { recadosReducer } from './recados/recadosSlice';
+import { contatosReducer } from './contatos/contatosSlice';
 import { userLoggedReducer } from './userLogged/userLoggedSlice';
 import { usersReducer } from './users/usersSlice';
 
@@ -8,7 +8,7 @@ import { usersReducer } from './users/usersSlice';
 const rootReducer = combineReducers({
   users: usersReducer,
   userLogged: userLoggedReducer,
-  recados: recadosReducer
+  contatos: contatosReducer,
 });
 
 export { rootReducer };
